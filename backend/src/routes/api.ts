@@ -1,10 +1,8 @@
 import express from "express";
-import dummmyController from "../controllers/dummyController";
+import dummyController from "../controllers/dummy.controller";
 
 const router = express.Router();
 
-
-router.get('/dummy', dummmyController.dummy);
-
+router.get("/dummy", dummyController.dummy);
 
 export default router;
