@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import { encrypt } from "../utils/encryption";
 
 
 export interface User {
@@ -50,4 +50,16 @@ const UserSchema = new Schema<User>({
   activationCode: {
     type: Schema.Types.String,
   },
-})
+},
+{
+  timestamps: true,
+});
+
+UserSchema.pre("save", function (next) {
+  const user = this;
+  user.password = encrypt(user.password);
+});
+
+const UserModel = mongoose.model("User", UserSchema);
+
+export default UserModel;
