@@ -11,6 +11,11 @@ type TRegister = {
   confirmPassword: string;
 };
 
+type TLogin = {
+  identifier: string;
+  password: string;
+};
+
 const registerValidateSchema = yup.object({
   fullName: yup.string().required(),
   username: yup.string().required(),
