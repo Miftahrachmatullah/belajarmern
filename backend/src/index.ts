@@ -1,5 +1,5 @@
-import app from "./app";
-import db from "./utils/database";
+import app from "./app.js";
+import db from "./utils/database.js";
 
 async function init() {
   try {

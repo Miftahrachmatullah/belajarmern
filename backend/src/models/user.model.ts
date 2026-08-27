@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { encrypt } from "../utils/encryption";
+import { encrypt } from "../utils/encryption.js";
 
 
 export interface User {

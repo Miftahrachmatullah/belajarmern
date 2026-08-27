@@ -1,7 +1,8 @@
+import { User } from "../models/user.model.js";
+import { SECRET } from "./env.js";
+
 import { Types } from "mongoose";
-import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
-import { SECRET } from "./env";
 
 export interface IUserToken 
 extends Omit <
