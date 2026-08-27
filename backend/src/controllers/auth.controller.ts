@@ -61,7 +61,7 @@ export default {
 
       return res.status(201).json({
         message: "Register successful",
-        data: user,
+        data: userWithoutPassword,
       });
     } catch (error) {
       const err = error as Error;
