@@ -7,8 +7,7 @@ import db from "./utils/database";
 async function init() {
   try {
     const result = await db();
-
-    console.log("Database status: ", result);
+    console.log("Database status:", result);
 
     const app = express();
 
@@ -22,7 +21,7 @@ async function init() {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Error starting the server: ", error);
+    console.error("Error starting the server:", error);
   }
 }
 

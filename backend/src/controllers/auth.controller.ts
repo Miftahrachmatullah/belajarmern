@@ -40,6 +40,7 @@ export default {
         password,
         confirmPassword,
       } = req.body as TRegister;
+
       await registerValidateSchema.validate({
         fullName,
         username,
@@ -47,88 +48,72 @@ export default {
         password,
         confirmPassword,
       });
+
       const result = await UserModel.create({
         fullName,
         username,
         email,
         password,
-      })
-      res.status(200).json({
+      });
+
+      const user = result.toObject();
+      delete user.password;
+
+      return res.status(201).json({
         message: "Register successful",
-        data: result,
-      });
-    } catch (error) {
-      const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
-    }
-  },
-  async login(req: Request, res: Response) {
-    const {
-      identifier,
-      password
-    } = req.body as unknown as TLogin;
-    try {
-      // ambil data user berdasarkan "identifier" --> username dan email 
-
-      const userByIdentifier = await UserModel.findOne({
-        $or: [
-          {
-            email: identifier
-          },
-          {
-            username: identifier,
-          },
-        ],
-      });
-
-      if(!userByIdentifier) {
-        return res.status(403).json({
-          message: "user not found",
-          data: null
-      });
-      }
-
-      // validasi password 
-      const validatePassword: boolean = 
-        encrypt(password) === userByIdentifier.password;
-
-      if(!validatePassword) {
-        return res.status(403).json({
-          message: "invalid password",
-          data: null
-      });
-      }
-
-      const token  = generateToken({ 
-        id: userByIdentifier._id, 
-        role: userByIdentifier.role, 
-      });
-
-      res.status(200).json({
-        message: "login successful",
-        data: token,
-      });
-    } catch (error) {
-      const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
-    }
-  },
-  async(req: Request, res: Response) {
-    try {
-      const user = req.user;
-      res.status(200).json({
-        message: "get user data successful",
         data: user,
       });
     } catch (error) {
       const err = error as Error;
-      res.status(400).json({
+
+      return res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async login(req: Request, res: Response) {
+    try {
+      const { identifier, password } = req.body as TLogin;
+
+      const user = await UserModel.findOne({
+        $or: [
+          { email: identifier },
+          { username: identifier },
+        ],
+      });
+
+      if (!user) {
+        return res.status(401).json({
+          message: "Invalid credentials",
+          data: null,
+        });
+      }
+
+      const validatePassword =
+        encrypt(password) === user.password;
+
+      if (!validatePassword) {
+        return res.status(401).json({
+          message: "Invalid credentials",
+          data: null,
+        });
+      }
+
+      const token = generateToken({
+        id: user._id,
+        role: user.role,
+      });
+
+      return res.status(200).json({
+        message: "Login successful",
+        data: token,
+      });
+    } catch (error) {
+      const err = error as Error;
+
+      return res.status(400).json({
         message: err.message,
         data: null,
       });
@@ -137,19 +122,33 @@ export default {
 
   async me(req: IReqUser, res: Response) {
     try {
-      const user = req.user;
-      const result = await UserModel.findById(user?.id);
+      if (!req.user?.id) {
+        return res.status(401).json({
+          message: "Unauthorized",
+          data: null,
+        });
+      }
 
-      res.status(200).json({
+      const result = await UserModel.findById(req.user.id);
+
+      if (!result) {
+        return res.status(404).json({
+          message: "User not found",
+          data: null,
+        });
+      }
+
+      return res.status(200).json({
         message: "Success get user profile",
         data: result,
       });
     } catch (error) {
       const err = error as Error;
-      res.status(400).json({
+
+      return res.status(400).json({
         message: err.message,
         data: null,
       });
     }
-  }
+  },
 };
