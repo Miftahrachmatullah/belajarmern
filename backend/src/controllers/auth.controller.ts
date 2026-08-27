@@ -57,7 +57,7 @@ export default {
       });
 
       const user = result.toObject();
-      delete user.password;
+      const { password: _, ...userWithoutPassword } = user;
 
       return res.status(201).json({
         message: "Register successful",
